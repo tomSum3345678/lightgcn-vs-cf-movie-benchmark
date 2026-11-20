@@ -31,7 +31,7 @@ In this project, we conduct a rigorous, multi-seed empirical study across three 
 
 1. **Refuting Prior Claims on Full-Catalog Ranking:** Under strict full-catalog ranking (masking seen items with $-\infty$ rather than sampling small negative subsets), **LightGCN** achieves the highest accuracy on sparse datasets (**MovieLens 100K NDCG@10 = 0.0679**), whereas classical **Truncated SVD** slightly edges out LightGCN on denser million-scale data (**MovieLens 1M NDCG@10 = 0.0408 vs. 0.0396**), with both models significantly outperforming **MF-BPR** ($p < 0.001$).
 2. **LightGCN vs. NGCF Efficiency & Accuracy:** By removing non-linear activations and feature transformation matrices, LightGCN outperforms NGCF in accuracy across all datasets while cutting training time on MovieLens 1M nearly in half (**2006s vs. 3911s**) and reducing per-user inference latency by over 50%.
-3. **Over-Smoothing & Diversity Trade-off:** Layer ablation (1 to 4 layers) demonstrates that accuracy peaks at **3 layers**, while **Intra-List Diversity (ILD@10)** monotonically decreases as layers deepen, providing direct empirical proof of GNN over-smoothing.
+3. **Over-Smoothing & Diversity Trade-off:** Layer ablation (1 to 4 layers) demonstrates that accuracy peaks at **3 layers**, while **Intra-List Diversity (ILD@10)** monotonically decreases on MovieLens 1M as layers deepen (from **0.7286** at Layer 1 to **0.7128** at Layer 4), providing direct empirical proof of GNN over-smoothing.
 4. **In-Batch Diversity Regularization:** Introducing an in-batch positive embedding cosine similarity penalty ($\lambda_{\text{div}} = 0.1$) significantly expands **Catalog Coverage** (from **29.03% to 34.44%** on 100K, and **41.57% to 44.73%** on 1M), effectively mitigating popularity bias.
 
 ## 📂 Repository Structure & Dataset Identification Guide
@@ -40,7 +40,7 @@ Because our training scripts (`comparison_lightgcn.py`, `train_ngcf.py`, and `ba
 
 ```text
 lightgcn-vs-cf-movie-benchmark/
-├── Datasets/                                    # 📌 [DEFAULT: MovieLens 100K] Standardized CSVs for the Flask Web Demo
+├── Datasets/                                    # 📌 [DEFAULT: MovieLens 100K] Standardized CSVs for the Flask Web App
 │   ├── movies.csv                               # 1,682 movies (converted from u.item)
 │   └── ratings.csv                              # 100,000 ratings (converted from u.data)
 ├── run_colab/                                   # ☁️ Self-contained folders ready for Google Colab or Local CLI execution
@@ -65,7 +65,7 @@ lightgcn-vs-cf-movie-benchmark/
 │   └── results_ml-latest-small/                 # Outputs for MovieLens Latest-Small
 ├── static/                                      # Benchmark visualizations served by the Flask Web App (100K)
 ├── templates/
-│   └── index.html                               # CINEGRAPH Bilingual (EN/繁中) Web UI
+│   └── index.html                               # Bilingual (EN/繁中) Flask Web UI
 ├── app.py                                       # Flask real-time recommendation server (LightGCN vs. SVD)
 ├── comparison_lightgcn.py                       # Root LightGCN module imported by app.py (configured for 100K)
 ├── lightgcn_model.pth                           # Pre-trained MovieLens 100K checkpoint loaded by app.py (~594 KB)
@@ -78,7 +78,7 @@ lightgcn-vs-cf-movie-benchmark/
 
 | Directory Path | Dataset Scale | `ratings.csv` Size | Primary Purpose |
 | :--- | :--- | :---: | :--- |
-| `lightgcn-vs-cf-movie-benchmark/Datasets/` | **MovieLens 100K** | ~2.4 MB | Default dataset loaded by `app.py` (CINEGRAPH Flask Web Demo) |
+| `lightgcn-vs-cf-movie-benchmark/Datasets/` | **MovieLens 100K** | ~2.4 MB | Default dataset loaded by `app.py` (Flask Web App) |
 | `run_colab/using_ml-latest-small/Datasets/` | **MovieLens Latest-Small** | ~2.4 MB | Rapid prototyping and initial pipeline validation |
 | `run_colab/using_ml-100k/Datasets/` | **MovieLens 100K** | ~2.4 MB | Primary benchmark experiment (942 active users, 1,427 items) |
 | `run_colab/using_ml-1m/Datasets/` | **MovieLens 1M** | ~21.5 MB | Large-scale benchmark validation (6,035 active users, 3,525 items) |
@@ -189,9 +189,9 @@ If you do not wish to train locally, you can upload the `run_colab/` folder (or 
    ```
    *(Note: If you download raw `u.data`/`u.item` or `.dat` files from GroupLens in the future, you can use `python prepare_dataset.py` in the root folder to convert them into `movies.csv` and `ratings.csv`.)*
 
-## 🌐 Running the CINEGRAPH Bilingual Web Demo (Local Flask Server)
+## 🌐 Running the Flask Web App (Local Server)
 
-We built a modern, theater-styled bilingual (**English / 繁體中文**) Flask web application (`CINEGRAPH`) that enables real-time side-by-side comparison between **LightGCN** and **Truncated SVD**, displaying live **Intra-List Diversity (ILD@K)**, **per-user inference latency**, **multi-genre filtering**, and direct **IMDb search integration**.
+We built a bilingual (**English / 繁體中文**) Flask web application that enables real-time side-by-side comparison between **LightGCN** and **Truncated SVD**, displaying live **Intra-List Diversity (ILD@K)**, **per-user inference latency**, **multi-genre filtering**, and direct **IMDb search links**.
 
 By default, the root directory is pre-configured with the **MovieLens 100K** dataset (`./Datasets/movies.csv` and `./Datasets/ratings.csv`) and the pre-trained 100K checkpoint (`./lightgcn_model.pth`) for instant startup:
 
@@ -204,9 +204,12 @@ By default, the root directory is pre-configured with the **MovieLens 100K** dat
    [http://127.0.0.1:5000](http://127.0.0.1:5000)
    ```
 
+<!-- Optional: Uncomment the line below after adding static/webapp_demo.png to your repository -->
+<!-- ![Flask Web App Interface](static/webapp_demo.png) -->
+
 ## 🙏 Acknowledgements & Inspiration
 
-* **Baseline Code Inspiration:** This project was initially inspired by [Sathwikreddy121/Movie-Recommendation-Website-using-LightGCN-approach](https://github.com/Sathwikreddy121/Movie-Recommendation-Website-using-LightGCN-approach) for the foundational LightGCN and Flask demo concept.
+* **Baseline Code Inspiration:** This project was initially inspired by [Sathwikreddy121/Movie-Recommendation-Website-using-LightGCN-approach](https://github.com/Sathwikreddy121/Movie-Recommendation-Website-using-LightGCN-approach) for the foundational LightGCN and Flask web app concept.
 * **Benchmark Reference:** Our cross-scale evaluation also directly examines and tests the MovieLens 1M claims from [Rodolfoxbc/beyond-model-complexity-recsys](https://github.com/Rodolfoxbc/beyond-model-complexity-recsys) (Bojorque et al., 2026).
 
 Building upon these foundations, our team independently designed and implemented:
@@ -219,7 +222,7 @@ Building upon these foundations, our team independently designed and implemented
 
 This project utilizes the **MovieLens** datasets (`ml-latest-small`, `ml-100k`, and `ml-1m`) provided by [GroupLens Research](https://grouplens.org/datasets/movielens/) at the University of Minnesota. Per the official dataset usage guidelines, we acknowledge and cite:
 
-> F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. *ACM Transactions on Interactive Intelligent Systems (TiiS)* 5, 4, Article 19 (December 2015), 19 pages. DOI=[http://dx.doi.org/10.1145/2827872](http://dx.doi.org/10.1145/2827872)
+> F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. *ACM Transactions on Interactive Intelligent Systems (TiiS)* 5, 4, Article 19 (December 2015), 19 pages. DOI: [10.1145/2827872](https://doi.org/10.1145/2827872)
 
 ```bibtex
 @article{harper2015movielens,
@@ -233,7 +236,7 @@ This project utilizes the **MovieLens** datasets (`ml-latest-small`, `ml-100k`, 
   month     = dec,
   year      = {2015},
   doi       = {10.1145/2827872},
-  url       = {[http://dx.doi.org/10.1145/2827872](http://dx.doi.org/10.1145/2827872)},
+  url       = {[https://doi.org/10.1145/2827872](https://doi.org/10.1145/2827872)},
   publisher = {ACM}
 }
 ```
@@ -243,7 +246,11 @@ This project utilizes the **MovieLens** datasets (`ml-latest-small`, `ml-100k`, 
 1. Koren, Y., Bell, R., & Volinsky, C. (2009). Matrix factorization techniques for recommender systems. *Computer*, 42(8), 30–37. https://doi.org/10.1109/MC.2009.263
 2. He, X., Deng, K., Wang, X., Li, Y., Zhang, Y., & Wang, M. (2020). LightGCN: Simplifying and powering graph convolution network for recommendation. *Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Information Retrieval*, 639–648. https://doi.org/10.1145/3397271.3401063
 3. Wang, X., He, X., Wang, M., Feng, F., & Chua, T.-S. (2019). Neural graph collaborative filtering. *Proceedings of the 42nd International ACM SIGIR Conference on Research and Development in Information Retrieval*, 165–174. https://doi.org/10.1145/3331184.3331267
-4. Bojorque, R., Yánez-Peter, D., & Arcos-Argudo, M. (2026). Beyond model complexity: A reproducible comparison of classical machine learning, matrix factorization, graph embeddings, and LightGCN for recommendation. *Algorithms*, 19(9), Article 735. https://doi.org/10.3390/a19090735
-5. Liu, H., Xu, J., Meng, S., Li, Q., & Fang, X. (2025). HCLDR: Heterogeneous graph convolutional networks with contrastive learning for diversity recommendation. *International Journal of Intelligent Networks*, 6, 293. https://doi.org/10.1016/j.ijin.2025.11.007
-6. Rendle, S., Freudenthaler, C., Gantner, Z., & Schmidt-Thieme, L. (2009). BPR: Bayesian personalized ranking from implicit feedback. *Proceedings of the 25th Conference on Uncertainty in Artificial Intelligence (UAI)*, 452–461.
-7. Harper, F. M., & Konstan, J. A. (2015). The MovieLens datasets: History and context. *ACM Transactions on Interactive Intelligent Systems (TiiS)*, 5(4), Article 19, 1–19. https://doi.org/10.1145/2827872
+4. Chen, Z. (2026). Personalized movie recommendation system based on graph neural networks. *Proceedings of the 3rd International Conference on Machine Intelligence and Digital Applications (MIDA 2026)*, 1454–1459. https://doi.org/10.1145/3801438.3806929
+5. Bojorque, R., Yánez-Peter, D., & Arcos-Argudo, M. (2026). Beyond model complexity: A reproducible comparison of classical machine learning, matrix factorization, graph embeddings, and LightGCN for recommendation. *Algorithms*, 19(9), Article 735. https://doi.org/10.3390/a19090735
+6. Goh, H. F., Zavier, R. A., Linggodigdo, A. C. S., Lucky, H., & Charisma, R. A. (2026). Comparative evaluation of precision and relevance in traditional, graph, and LLM-prompted recommender models. *2026 13th International Conference on ICT for Smart Society (ICISS)*. IEEE. https://ieeexplore.ieee.org/document/11715414
+7. Liu, H., Xu, J., Meng, S., Li, Q., & Fang, X. (2025). HCLDR: Heterogeneous graph convolutional networks with contrastive learning for diversity recommendation. *International Journal of Intelligent Networks*, 6, 293. https://doi.org/10.1016/j.ijin.2025.11.007
+8. Bojorque, R. X., Yánez-Peter, D., & Arcos-Argudo, M. (2026). *Beyond model complexity: A reproducible benchmark of classical, latent-factor, and graph-based recommender systems on MovieLens 1M* [GitHub repository]. https://github.com/Rodolfoxbc/beyond-model-complexity-recsys
+9. Harper, F. M., & Konstan, J. A. (2015). The MovieLens datasets: History and context. *ACM Transactions on Interactive Intelligent Systems (TiiS)*, 5(4), Article 19, 1–19. https://doi.org/10.1145/2827872
+10. Sathwikreddy121. (2024). *Movie-Recommendation-Website-using-LightGCN-approach* [GitHub repository]. https://github.com/Sathwikreddy121/Movie-Recommendation-Website-using-LightGCN-approach
+11. Rendle, S., Freudenthaler, C., Gantner, Z., & Schmidt-Thieme, L. (2009). BPR: Bayesian personalized ranking from implicit feedback. *Proceedings of the 25th Conference on Uncertainty in Artificial Intelligence (UAI)*, 452–461.
