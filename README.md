@@ -204,6 +204,17 @@ By default, the root directory is pre-configured with the **MovieLens 100K** dat
    [http://127.0.0.1:5000](http://127.0.0.1:5000)
    ```
 
+## 🙏 Acknowledgements & Inspiration
+
+* **Baseline Code Inspiration:** This project was initially inspired by [Sathwikreddy121/Movie-Recommendation-Website-using-LightGCN-approach](https://github.com/Sathwikreddy121/Movie-Recommendation-Website-using-LightGCN-approach) for the foundational LightGCN and Flask demo concept.
+* **Benchmark Reference:** Our cross-scale evaluation also directly examines and tests the MovieLens 1M claims from [Rodolfoxbc/beyond-model-complexity-recsys](https://github.com/Rodolfoxbc/beyond-model-complexity-recsys) (Bojorque et al., 2026).
+
+Building upon these foundations, our team independently designed and implemented:
+1. A strict chronological **Leave-One-Out (LOO) full-catalog evaluation pipeline** across **MovieLens Latest-Small, 100K, and 1M** with 3 random seeds and **paired Student's t-tests**.
+2. Multi-dimensional benchmarking across **6 models** (LightGCN, NGCF, Truncated SVD, MF-BPR, Cosine Similarity, and Popularity) covering **Precision, Recall, NDCG, ILD@10, Catalog Coverage, and runtime latency**.
+3. An **in-batch cosine diversity regularizer ($\lambda_{\text{div}} = 0.1$)** and a **1-to-4 layer GNN over-smoothing ablation study**.
+4. A redesigned **bilingual (EN / 繁中) Flask Web App** featuring real-time LightGCN vs. SVD side-by-side comparison, live ILD and latency metrics, multi-genre filtering, and IMDb search links.
+
 ## 🗄️ Dataset Acknowledgment
 
 This project utilizes the **MovieLens** datasets (`ml-latest-small`, `ml-100k`, and `ml-1m`) provided by [GroupLens Research](https://grouplens.org/datasets/movielens/) at the University of Minnesota. Per the official dataset usage guidelines, we acknowledge and cite:
