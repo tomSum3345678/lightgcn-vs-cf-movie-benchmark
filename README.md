@@ -204,8 +204,7 @@ By default, the root directory is pre-configured with the **MovieLens 100K** dat
    [http://127.0.0.1:5000](http://127.0.0.1:5000)
    ```
 
-<!-- Optional: Uncomment the line below after adding static/webapp_demo.png to your repository -->
-<!-- ![Flask Web App Interface](static/webapp_demo.png) -->
+![Flask Web App Interface](static/webapp_demo.png)
 
 ## 🙏 Acknowledgements & Inspiration
 
